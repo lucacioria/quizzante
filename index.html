@@ -9468,6 +9468,23 @@
     #statistic-eta .value {
       font-size: 20px !important;
     }
+
+    .emoji {
+      position: absolute;
+      display: inline-block;
+      right: 10px;
+      top: 10px;
+      font-size: 50px;
+      line-height: 50px;
+    }
+
+    .motivational-message {
+      position: absolute;
+      right: 70px;
+      top: 10px;
+      line-height: 50px;
+      font-size: 15px;
+    }
   </style>
 
 </head>
@@ -9553,7 +9570,24 @@
 
       const image = q.img ? `<div class="image"><img src="img/B${questionId}.jpg"></div>` : '';
 
+      const correctAnswers = lastResults.filter(r => r.answeredCorrectly).length;
+      const emoji = lastResults.length === 20 ?
+        (correctAnswers < 17 ? '😩' : '😎' ):
+        '🤔';
+
       return `
+        <span class="motivational-message">
+          ${
+            (() => {
+              switch(emoji) {
+                case '😩': return `Daje, ti bastano ${17 - correctAnswers} risposte corrette!`
+                case '😎': return 'Promosso!'
+                case '🤔': return `Rispondi ad almeno 20 domande`
+              }
+            })()
+          }
+        </span>
+        <span class="emoji">${emoji}</span>
         <div class="ui items">
           <div class="item">
             <div class="content">
