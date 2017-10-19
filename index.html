@@ -9550,6 +9550,11 @@
       return `${Math.floor(hours)}h ${Math.floor(minutes)}m`;
     }
 
+    function getEmoji(lastResults) {
+      const correctAnswers = lastResults.filter(r => r.answeredCorrectly).length;
+      return lastResults.length === 20 ? (correctAnswers < 17 ? '😩' : '😎' ) : '🤔';
+    }
+
     function getQuestionHtml(q) {
       const questionId = q.q.split(' ')[0];
       const questionText = q.q.split(' ').slice(1).join(' ');
@@ -9570,17 +9575,24 @@
 
       const image = q.img ? `<div class="image"><img src="img/B${questionId}.jpg"></div>` : '';
 
-      const correctAnswers = lastResults.filter(r => r.answeredCorrectly).length;
-      const emoji = lastResults.length === 20 ?
-        (correctAnswers < 17 ? '😩' : '😎' ):
-        '🤔';
+      const emoji = getEmoji(lastResults);
+      const bocciato = emoji === '😩';
+
 
       return `
         <span class="motivational-message">
           ${
             (() => {
               switch(emoji) {
-                case '😩': return `Daje, ti bastano ${17 - correctAnswers} risposte corrette!`
+                case '😩':
+                  const correctAnswersNeeded = lastResults.reduce((acc, _, i) => {
+                    acc.lastResults = acc.lastResults.slice(1).concat({ answeredCorrectly: true });
+                    if (acc.index === -1 && getEmoji(acc.lastResults) === '😎') {
+                      acc.index = i + 1;
+                    }
+                    return acc;
+                  }, { lastResults, index: -1 }).index
+                  return `Daje, ti bastano ${correctAnswersNeeded} risposte corrette!`
                 case '😎': return 'Promosso!'
                 case '🤔': return `Rispondi ad almeno 20 domande`
               }
