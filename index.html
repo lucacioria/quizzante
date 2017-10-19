@@ -6,7 +6,6 @@
   <title>Patente Nautica</title>
   <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
   <script type="text/javascript">
     const data = [
       {
@@ -9352,7 +9351,7 @@
       line-height: 1.5em;
       font-size: 17px;
       text-align: left;
-      border-radius: 0 !important;
+      border-radius: 0;
       border: none !important;
       margin: 0;
     }
@@ -9366,7 +9365,17 @@
       transform: scale(1.05);
       border-radius: 3px !important;
     }
-    
+
+    .ui.button.abtn:first-child {
+      border-top-left-radius: .28571429rem;
+      border-top-right-radius: .28571429rem;
+    }
+
+    .ui.button.abtn:last-child {
+      border-bottom-left-radius: .28571429rem;
+      border-bottom-right-radius: .28571429rem;
+    }
+
     .ui.button.abtn:not(:first-child) {
       border-top: rgba(0,0,0,0.1) solid 1px !important;
     }
@@ -9406,26 +9415,6 @@
       margin-top: auto;
       justify-content: flex-end;
       margin-bottom: 0;
-      overflow: hidden;
-    }
-
-    #progress-bar.ui.progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      margin: 0 !important;
-      border-radius: 0;
-      display: none;
-    }
-
-    #progress-bar.ui.progress .bar {
-      border-radius: 0;
-      min-width: 55px !important;
-    }
-    #progress-bar.ui.active.progress .bar::after {
-      animation: none;
-      -webkit-animation: none;
     }
 
     #results {
@@ -9435,13 +9424,13 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 25px;
       justify-content: flex-end;
     }
 
     #results .result {
-      width: 5%;
-      height: 25px;
+      width: calc(5% - 1px);
+      margin: 0 .5px;
+      height: 5px;
       background: rgba(0,0,0,0.1);
     }
 
@@ -9528,7 +9517,7 @@
       }
 
     }
-    
+
     const history = new History(JSON.parse(localStorage.getItem('history') || '[]'), data);
 
     function convertSecondsToHours(seconds) {
@@ -9545,9 +9534,10 @@
 
       const progressDataTotal = Math.min(history.history.length, 20);
 
-      const getHistoryQuestions = history.history.slice(Math.max(history.history.length - progressDataTotal, 0)).map(r => {
+      const lastResults = history.history.slice(Math.max(history.history.length - progressDataTotal, 0));
+      const resultsElements = [...Array(20 - lastResults.length)].map(() => '<div class="result"></div>').concat(lastResults.map(r => {
         return `<div class="result ${r.answeredCorrectly ? 'positive' : 'negative'}"></div>`;
-      }).join('\n');
+      })).join('\n');
 
       const rate = history.history.length / (history.data.length * history.multiplier - history.weightedIds.length);
       const adjustedRate = (1.5 * 200 + rate * history.history.length) / (200 + history.history.length);
@@ -9556,13 +9546,8 @@
       const tempo = averageTime * history.weightedIds.length * adjustedRate;
 
       return `
-        <div id="progress-bar" class="ui indicating progress" data-value="${history.history.slice(Math.max(history.history.length - progressDataTotal, 0)).filter(r => r.answeredCorrectly).length}" data-total="${progressDataTotal}">
-          <div class="bar">
-            <div class="progress"></div>
-          </div>
-        </div>
         <div id="results">
-          ${getHistoryQuestions}
+          ${resultsElements}
         </div>
         <div class="ui statistics">
           <div id="statistic-done" class="statistic">
@@ -9575,7 +9560,7 @@
           </div>
           <div id="statistic-eta" class="statistic">
             <div class="value">
-              ${convertSecondsToHours(tempo)}
+              ${isNaN(rate) ? 'TBD' : convertSecondsToHours(tempo)}
             </div>
             <div class="label">
               ETA
@@ -9607,12 +9592,6 @@
       _timeoutId = null;
       startTime = Date.now();
       document.getElementById('root').innerHTML = getQuestionHtml(history.getNextQuestion());
-      $('.ui.progress').progress({
-        label: 'ratio',
-        text: {
-          ratio: '{value} su {total}'
-        }
-      })
     }
 
     function onUserAnswer(answer, vf, correctAnswer, questionId) {
@@ -9622,7 +9601,7 @@
           document.getElementById(`a${answer}`).className += " negative";
           timeout = 4000;
         }
-        
+
         document.getElementById(`a${correctAnswer}`).className += " positive";
 
         history.addResult({
