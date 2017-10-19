@@ -9513,7 +9513,7 @@
       }
 
       getNextQuestion() {
-        return this.data[this.weightedIds[Math.floor(Math.random() * this.weightedIds.length)]];
+        return this.data[this.weightedIds[Math.floor(Math.random() * this.weightedIds.length)] - 1];
       }
 
       addResult(result) {
