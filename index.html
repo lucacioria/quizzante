@@ -9335,13 +9335,23 @@
     }
 
     #root {
-      padding: 20px;
+      /* padding: 20px; */
       height: 100vh;
       background: #fafafa;
-      padding-top: 50px;
+      /* padding-top: 50px; */
       display: flex;
       flex-direction: column;
     }
+
+    #answers {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      margin-top: auto;
+      justify-content: flex-end;
+      margin-bottom: 0;
+    }
+
     .ui.button.abtn {
       padding: 20px !important;
       color: #232323 !important;
@@ -9388,42 +9398,41 @@
       background: rgba(0,0,0,0.05);
     }
 
-    .ui.items .item {
-      margin-top: 0 !important;
-    }
-
     .ui.items {
       margin: 0 !important;
+      padding: 50px;
+      background: lightskyblue;
+      /* position: absolute; */
+    }
+
+    .ui.items .item {
+      margin: 0 !important;
+      padding: 15px;
+      border-radius: 3px;
     }
 
     .item .header .label {
       font-size: 17.0px !important;
+      background: rgba(0,0,0,.1) !important;
     }
 
     .item .description {
       font-size: 20px !important;
+      color: white !important;
     }
 
     .image > img {
       margin-top: 3.5em;
     }
 
-    #answers {
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      margin-top: auto;
-      justify-content: flex-end;
-      margin-bottom: 0;
-    }
-
     #results {
       display: flex;
       width: 100vw;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      /* position: absolute; */
+      /* top: 0; */
+      /* left: 0; */
+      /* right: 0; */
+      /* bottom: 0; */
       justify-content: flex-end;
     }
 
@@ -9435,27 +9444,24 @@
     }
 
     #results .result.positive {
-      background: rgb(45, 183, 76);
+      background: rgba(45, 183, 76, .7);
     }
 
     #results .result.negative {
-      background: rgb(216, 43, 48);
+      background: rgba(216, 43, 48, .7);
     }
 
     .ui.statistics {
       margin: 0;
+      display: flex;
+      padding: 8px;
     }
 
     #statistic-done,
     #statistic-eta {
-      position: fixed;
-      top: 46px;
-      right: 0;
-      margin-bottom: 0;
-    }
-
-    #statistic-eta {
-      right: 80px;
+      flex-basis: 50%;
+      flex-shrink: 0;
+      margin: 0;
     }
 
     #statistic-done .value,
@@ -9545,7 +9551,20 @@
       const averageTime = times.reduce((sum, x) => sum + x, 0) / times.length / 1000;
       const tempo = averageTime * history.weightedIds.length * adjustedRate;
 
+      const image = q.img ? `<div class="image"><img src="img/B${questionId}.jpg"></div>` : '';
+
       return `
+        <div class="ui items">
+          <div class="item">
+            <div class="content">
+              <div class="header"><div class="ui label violet">Domanda ${questionId}</div></div>
+              <div class="description">
+                <p>${questionText}</p>
+              </div>
+            </div>
+            ${image}
+          </div>
+        </div>
         <div id="results">
           ${resultsElements}
         </div>
@@ -9567,23 +9586,12 @@
             </div>
           </div>
         </div>
-        <div class="ui items">
-          <div class="item">
-            <div class="content">
-              <div class="header"><div class="ui label violet">Domanda ${questionId}</div></div>
-              <div class="description">
-                <p>${questionText}</p>
-              </div>
-            </div>
-            <div class="image">
-              <img src="img/B${questionId}.jpg">
-            </div>
+        <div style="padding: 0 10px 10px 10px; margin-top: auto;">
+          <div id="answers" class="ui raised segments">
+            <div id="a1" onclick="onUserAnswer(1, '${q.a[0].slice(0,1)}', ${correctAnswer}, ${questionId})" class="abtn ui button fluid">${q.a[0].slice(4)}</div>
+            <div id="a2" onclick="onUserAnswer(2, '${q.a[1].slice(0,1)}', ${correctAnswer}, ${questionId})" class="abtn ui button fluid">${q.a[1].slice(4)}</div>
+            <div id="a3" onclick="onUserAnswer(3, '${q.a[2].slice(0,1)}', ${correctAnswer}, ${questionId})" class="abtn ui button fluid">${q.a[2].slice(4)}</div>
           </div>
-        </div>
-        <div id="answers" class="ui raised segments">
-          <div id="a1" onclick="onUserAnswer(1, '${q.a[0].slice(0,1)}', ${correctAnswer}, ${questionId})" class="abtn ui button fluid">${q.a[0].slice(4)}</div>
-          <div id="a2" onclick="onUserAnswer(2, '${q.a[1].slice(0,1)}', ${correctAnswer}, ${questionId})" class="abtn ui button fluid">${q.a[1].slice(4)}</div>
-          <div id="a3" onclick="onUserAnswer(3, '${q.a[2].slice(0,1)}', ${correctAnswer}, ${questionId})" class="abtn ui button fluid">${q.a[2].slice(4)}</div>
         </div>
         `
     };
