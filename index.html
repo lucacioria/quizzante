@@ -9506,7 +9506,9 @@
             this.weightedIds = this.weightedIds.slice(0, index).concat(this.weightedIds.slice(index + 1));
           }
         } else {
-          this.weightedIds.push(questionId);
+          if (this.weightedIds.filter(id => id === questionId).length < this.multiplier) {
+            this.weightedIds.push(questionId);
+          }
         }
       }
 
