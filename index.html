@@ -6400,7 +6400,7 @@
       {
         "q": "788 I valori della deviazione magnetica sono reperibili:",
         "a": [
-          "F | su tabelle in dotazione alle imbarcazioni.",
+          "V | su tabelle in dotazione alle imbarcazioni.",
           "F | sulle carte nautiche.",
           "F | sul portolano e sull'elenco fari e fanali."
         ]
@@ -9550,7 +9550,10 @@
       }).join('\n');
 
       const rate = history.history.length / (history.data.length * history.multiplier - history.weightedIds.length);
-      const tempo = 30 * history.weightedIds.length * rate;
+      const adjustedRate = (1.5 * 200 + rate * history.history.length) / (200 + history.history.length);
+      const times = history.history.map((x)=>x.time).filter((x) => x < 60000);
+      const averageTime = times.reduce((sum, x) => sum + x, 0) / times.length / 1000;
+      const tempo = averageTime * history.weightedIds.length * adjustedRate;
 
       return `
         <div id="progress-bar" class="ui indicating progress" data-value="${history.history.slice(Math.max(history.history.length - progressDataTotal, 0)).filter(r => r.answeredCorrectly).length}" data-total="${progressDataTotal}">
